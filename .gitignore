@@ -1,0 +1,42 @@
+# Setup marker (tells coding agents setup has run; see CLAUDE.md)
+.setup-complete
+
+# Build output
+/bin/
+/pi-go-test/pi-go-test
+*.exe
+*.test
+*.out
+*.o
+*.a
+
+# Go
+vendor/
+go.work
+go.work.sum
+coverage.txt
+coverage.html
+*.prof
+
+# Env / secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Test harness artifacts
+pi-go-test/sessions/
+pi-go-test/workspace/
+
+# Editors / OS
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

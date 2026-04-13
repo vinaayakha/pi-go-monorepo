@@ -1,0 +1,15 @@
+{
+  "go.goroot": "/opt/homebrew/Cellar/go/1.24.3/libexec",
+  "go.gopath": "/Users/apple/go",
+  "go.alternateTools": {
+    "go": "/opt/homebrew/bin/go"
+  },
+  "go.toolsEnvVars": {
+    "PATH": "/opt/homebrew/bin:/opt/homebrew/sbin:/Users/apple/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "GOROOT": "/opt/homebrew/Cellar/go/1.24.3/libexec",
+    "GOPATH": "/Users/apple/go"
+  },
+  "gopls": {
+    "build.directoryFilters": ["-**/bin"]
+  }
+}
