@@ -29,8 +29,52 @@ jobs:
       - name: Build autotest binary
         run: make build-autotest
 
+      - name: Run deterministic tests
+        id: gotest
+        run: |
+          cd pi-go
+          set +e
+          go test -json ./... | tee ../test-results.json
+          status=${PIPESTATUS[0]}
+          set -e
+          pass=$(jq -rs '[.[] | select(.Action=="pass" and (.Test|not))] | length' ../test-results.json)
+          fail=$(jq -rs '[.[] | select(.Action=="fail" and (.Test|not))] | length' ../test-results.json)
+          skip=$(jq -rs '[.[] | select(.Action=="skip" and (.Test|not))] | length' ../test-results.json)
+          total=$((pass + fail + skip))
+          echo "pass=$pass"   >> $GITHUB_OUTPUT
+          echo "fail=$fail"   >> $GITHUB_OUTPUT
+          echo "skip=$skip"   >> $GITHUB_OUTPUT
+          echo "total=$total" >> $GITHUB_OUTPUT
+          exit $status
+
       - name: Run SDK integration tests
+        id: autotest
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
         run: make autotest
+
+      - name: Publish test summary
+        if: always()
+        run: |
+          {
+            echo "## pi-go deterministic tests"
+            echo ""
+            echo "| Metric | Count |"
+            echo "|---|---|"
+            echo "| Packages passed | ${{ steps.gotest.outputs.pass }} |"
+            echo "| Packages failed | ${{ steps.gotest.outputs.fail }} |"
+            echo "| Packages skipped | ${{ steps.gotest.outputs.skip }} |"
+            echo "| Total packages  | ${{ steps.gotest.outputs.total }} |"
+            echo ""
+            echo "## SDK autotest (live provider)"
+            echo ""
+            echo "Status: **${{ steps.autotest.outcome }}**"
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload test JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-test-json
+          path: test-results.json

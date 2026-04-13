@@ -1,9 +1,10 @@
-.PHONY: all setup build build-lib build-test test test-lib vet fmt tidy run clean check-secrets help
+.PHONY: all setup build build-lib build-test build-autotest test test-lib vet fmt tidy run autotest clean check-secrets help
 
-LIB_DIR   := pi-go
-TEST_DIR  := pi-go-test
-BIN_DIR   := bin
-TEST_BIN  := $(BIN_DIR)/pi-go-test
+LIB_DIR       := pi-go
+TEST_DIR      := pi-go-test
+BIN_DIR       := bin
+TEST_BIN      := $(BIN_DIR)/pi-go-test
+AUTOTEST_BIN  := $(BIN_DIR)/pi-go-autotest
 
 all: build test
 
@@ -14,6 +15,8 @@ help:
 	@echo "  build          Build library + test harness binary ($(TEST_BIN))"
 	@echo "  build-lib   go build ./... in $(LIB_DIR)"
 	@echo "  build-test  Build test harness into $(TEST_BIN)"
+	@echo "  build-autotest  Compile $(TEST_DIR)/ → $(AUTOTEST_BIN)"
+	@echo "  autotest    Build + run autotest (needs OPENAI_API_KEY and OPENAI_MODEL)"
 	@echo "  test        Run all tests in $(LIB_DIR)"
 	@echo "  vet         go vet both modules"
 	@echo "  fmt         gofmt -w both modules"
@@ -31,6 +34,15 @@ $(BIN_DIR):
 
 build-test: | $(BIN_DIR)
 	cd $(TEST_DIR) && go build -o ../$(TEST_BIN) .
+
+build-autotest: | $(BIN_DIR)
+	cd $(TEST_DIR) && go build -o ../$(AUTOTEST_BIN) ./autotest
+
+autotest: build-autotest
+	@if [ -z "$$OPENAI_API_KEY" ] || [ -z "$$OPENAI_MODEL" ]; then \
+		echo "OPENAI_API_KEY and OPENAI_MODEL must be set"; exit 1; \
+	fi
+	cd $(TEST_DIR) && ../$(AUTOTEST_BIN)
 
 test: test-lib
 
