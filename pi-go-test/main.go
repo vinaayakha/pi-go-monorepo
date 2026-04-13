@@ -167,7 +167,7 @@ func main() {
 	model := ai.Model{
 		ID:            modelID,
 		Name:          modelID,
-		API:           ai.APIOpenAICompletions,
+		API:           ai.APIOpenAIResponses,
 		Provider:      ai.ProviderOpenAI,
 		BaseURL:       "https://api.openai.com",
 		ContextWindow: 128000,
