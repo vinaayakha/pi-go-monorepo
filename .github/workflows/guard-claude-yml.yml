@@ -1,0 +1,25 @@
+name: Guard claude.yml
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/claude.yml
+      - .github/workflows/guard-claude-yml.yml
+      - .github/CODEOWNERS
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Block non-owner edits
+        env:
+          SENDER: ${{ github.event.pull_request.user.login }}
+          OWNER: ${{ github.repository_owner }}
+          ASSOC: ${{ github.event.pull_request.author_association }}
+        run: |
+          if [ "$SENDER" = "$OWNER" ] || [ "$ASSOC" = "OWNER" ] || [ "$ASSOC" = "MEMBER" ] || [ "$ASSOC" = "COLLABORATOR" ]; then
+            echo "Allowed: $SENDER ($ASSOC)"
+            exit 0
+          fi
+          echo "::error::PR from $SENDER ($ASSOC) cannot modify Claude workflow files."
+          exit 1

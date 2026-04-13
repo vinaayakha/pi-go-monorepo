@@ -1,0 +1,36 @@
+name: SDK integration tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pi-go/**'
+      - 'pi-go-test/**'
+      - 'Makefile'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pi-go/**'
+      - 'pi-go-test/**'
+      - 'Makefile'
+
+jobs:
+  autotest:
+    name: Run pi-go autotest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - name: Build autotest binary
+        run: make build-autotest
+
+      - name: Run SDK integration tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+        run: make autotest
