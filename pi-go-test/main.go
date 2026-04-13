@@ -159,7 +159,7 @@ func main() {
 	}
 	modelID := os.Getenv("OPENAI_MODEL")
 	if modelID == "" {
-		modelID = "gpt-4o-mini"
+		modelID = "gpt-4.1-mini"
 	}
 
 	providers.RegisterBuiltins()
